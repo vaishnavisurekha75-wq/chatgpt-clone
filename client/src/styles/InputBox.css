@@ -1,0 +1,72 @@
+.input-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: #343541;
+  border-top: 1px solid #444;
+}
+
+.input-container input {
+  flex: 1;
+  padding: 15px 18px;
+  background: #40414f;
+  color: white;
+  border: 1px solid #565869;
+  border-radius: 12px;
+  outline: none;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.input-container input:focus {
+  border-color: #10a37f;
+}
+
+.input-container input::placeholder {
+  color: #b4b4b4;
+}
+
+.input-container button {
+  padding: 15px 22px;
+  background: #10a37f;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.input-container button:hover {
+  background: #0d8d6d;
+}
+
+.input-container button:active {
+  transform: scale(0.97);
+}
+/* Mic Button */
+.mic-btn {
+  width: 52px;
+  height: 52px;
+  padding: 0 !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+  border-radius: 50%;
+  background: #10a37f;
+  transition: 0.3s;
+}
+
+.mic-btn:hover {
+  background: #0d8d6d;
+  transform: scale(1.05);
+}
+
+.mic-btn:active {
+  transform: scale(0.95);
+}
