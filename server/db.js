@@ -1,4 +1,4 @@
-require("dotenv").config():
+require("dotenv").config();
 
 const { MongoClient } = require("mongodb");
 
@@ -19,11 +19,8 @@ async function connectDB() {
     database = client.db("chatgpt_clone");
 
     console.log("✅ MongoDB Connected");
-
-    return database;
   } catch (error) {
-    console.error("❌ MongoDB Error:", error.message);
-    throw error;
+    console.log("❌ MongoDB Error:", error.message);
   }
 }
 
