@@ -7,8 +7,6 @@ dotenv.config();
 
 const { connectDB, getDB } = require("./db");
 
-connectDB();
-
 const app = express();
 
 app.use(cors());
@@ -19,14 +17,28 @@ console.log(
   !!process.env.OPENROUTER_API_KEY
 );
 
+// ===============================
+// CHAT API
+// ===============================
+
 app.post("/chat", async (req, res) => {
   try {
     const { message } = req.body;
 
+    if (!message || !message.trim()) {
+      return res.status(400).json({
+        reply: "Please enter a message.",
+      });
+    }
+
     console.log("User:", message);
 
-    // ⏱ Start timer
+    // Start timer
     console.time("AI Response");
+
+    // ===============================
+    // OPENROUTER API
+    // ===============================
 
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
@@ -47,20 +59,31 @@ app.post("/chat", async (req, res) => {
       }
     );
 
-    // ⏱ End timer
+    // End timer
     console.timeEnd("AI Response");
 
-    const reply = response.data.choices[0].message.content;
-
-const db = getDB();
-
-await db.collection("messages").insertOne({
-  user: message,
-  bot: reply,
-  createdAt: new Date(),
-});
+    const reply =
+      response.data.choices[0].message.content;
 
     console.log("Bot:", reply);
+
+    // ===============================
+    // SAVE MESSAGE TO MONGODB
+    // ===============================
+
+    const db = getDB();
+
+    await db.collection("messages").insertOne({
+      user: message,
+      bot: reply,
+      createdAt: new Date(),
+    });
+
+    console.log("✅ Message saved to MongoDB");
+
+    // ===============================
+    // SEND RESPONSE TO FRONTEND
+    // ===============================
 
     res.json({
       reply: reply,
@@ -69,17 +92,32 @@ await db.collection("messages").insertOne({
   } catch (error) {
 
     console.log("========== ERROR ==========");
-    console.log("Message:", error.message);
+
+    console.log(
+      "Message:",
+      error.message
+    );
 
     if (error.response) {
-      console.log("Status:", error.response.status);
+
+      console.log(
+        "Status:",
+        error.response.status
+      );
+
       console.log(
         "Data:",
-        JSON.stringify(error.response.data, null, 2)
+        JSON.stringify(
+          error.response.data,
+          null,
+          2
+        )
       );
     }
 
-    console.log("===========================");
+    console.log(
+      "==========================="
+    );
 
     res.status(500).json({
       reply: "Server Error",
@@ -87,10 +125,45 @@ await db.collection("messages").insertOne({
   }
 });
 
+// ===============================
+// HOME ROUTE
+// ===============================
+
 app.get("/", (req, res) => {
-  res.send("Server Running");
+  res.send("Server Running 🚀");
 });
 
-app.listen(process.env.PORT || 5000, () => {
-  console.log("Server running on port 5000");
-});
+// ===============================
+// START SERVER
+// ===============================
+
+async function startServer() {
+
+  try {
+
+    // Connect MongoDB first
+    await connectDB();
+
+    const PORT =
+      process.env.PORT || 5000;
+
+    app.listen(PORT, () => {
+
+      console.log(
+        `🚀 Server running on port ${PORT}`
+      );
+
+    });
+
+  } catch (error) {
+
+    console.error(
+      "❌ Server startup failed:",
+      error.message
+    );
+
+    process.exit(1);
+  }
+}
+
+startServer();
